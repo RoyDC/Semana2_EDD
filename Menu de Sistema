@@ -1,0 +1,100 @@
+cout << "\n====== MENÚ DEL SISTEMA ======\n";
+    cout << "1. Insertar proceso\n";
+    cout << "2. Encolar proceso por prioridad\n";
+    cout << "3. Push bloque de memoria\n";
+    cout << "4. Pop bloque de memoria\n";
+    cout << "5. Insertar archivo\n";
+    cout << "6. Ordenar archivos\n";
+    cout << "7. Buscar archivo\n";
+    cout << "8. Salir\n";
+    cout << "Opcion: ";
+    cin >> opcion;
+
+    switch (opcion) {
+        case 1: {
+            Proceso p;
+            cout << "ID: "; 
+            cin >> p.id;
+            cout << "Nombre: "; 
+            cin >> p.nombre;
+            cout << "Prioridad: ";
+            cin >> p.prioridad;
+            insertarProceso(p);
+            cout << "Proceso insertado.\n";
+            break;
+        }
+
+        case 2: {
+            Proceso p;
+            cout << "ID: ";
+            cin >> p.id;
+            cout << "Nombre: "; 
+            cin >> p.nombre;
+            cout << "Prioridad: "; 
+            cin >> p.prioridad;
+            encolarProceso(p);
+            cout << "Proceso encolado.\n";
+            break;
+        }
+
+        case 3: {
+            string dir;
+             int tam;
+             
+            cout << "Dirección: "; 
+            cin >> dir;
+            cout << "Tamaño: "; 
+            cin >> tam;
+            pushMemoria(dir, tam);
+            cout << "Bloque apilado.\n";
+            break;
+        }
+
+        case 4: {
+            popMemoria();
+            break;
+        }
+
+        case 5: {
+            Archivo a;
+            cout << "Nombre archivo: ";
+             cin >> a.nombre;
+            cout << "Tamaño: ";
+             cin >> a.tama;
+            insertarArchivo(a);
+            cout << "Archivo insertado.\n";
+            break;
+        }
+
+        case 6: {
+            ordenarArchivosBurbuja();
+            cout << "Archivos ordenados.\n";
+            break;
+        }
+
+        case 7: {
+            ordenarArchivosBurbuja(); 
+            Archivo arr[MAX_ARCHIVOS];
+            int total = listaAArreglo(arr, MAX_ARCHIVOS);
+            string nombre;
+            cout << "Archivo a buscar: "; 
+            cin >> nombre;
+            int pos = busquedaBinaria(arr, total, nombre);
+            if (pos != -1)
+                cout << "Archivo encontrado en posición " << pos << endl;
+            else
+                cout << "Archivo no encontrado.\n";
+            break;
+        }
+
+        case 8:
+            cout << "Fin del programa.\n";
+            break;
+
+        default:
+            cout << "Opcion invalida. Intente de nuevo.\n";
+            break;
+    }
+
+} while (opcion != 8);
+}
