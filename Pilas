@@ -1,0 +1,15 @@
+void pushMemoria(string direccion, int tama) {
+    NodoMemoria* nuevo = new NodoMemoria{direccion, tama, pilaMemoria};
+    pilaMemoria = nuevo;
+}
+
+void popMemoria() {
+    if (pilaMemoria) {
+        NodoMemoria* temp = pilaMemoria;
+        pilaMemoria = pilaMemoria->siguiente;
+        delete temp;
+        cout << "Bloque desapilado.\n";
+    } else {
+        cout << "Pila vacia.\n";
+    }
+}
