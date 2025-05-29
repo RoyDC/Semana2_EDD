@@ -1,0 +1,30 @@
+void ordenarArchivosBurbuja() {
+    if (!listaArchivos) return;
+    bool cambiado;
+    do {
+        cambiado = false;
+        NodoArchivo* actual = listaArchivos;
+        while (actual->siguiente) {
+            if (actual->dato.nombre > actual->siguiente->dato.nombre) {
+                swap(actual->dato, actual->siguiente->dato);
+                cambiado = true;
+            }
+            actual = actual->siguiente;
+        }
+    } while (cambiado);
+}
+
+
+int busquedaBinaria(Archivo archivos[], int tam, string objetivo) {
+    int inicio = 0, fin = tam - 1;
+    while (inicio <= fin) {
+        int medio = (inicio + fin) / 2;
+        if (archivos[medio].nombre == objetivo)
+            return medio;
+        else if (archivos[medio].nombre < objetivo)
+            inicio = medio + 1;
+        else
+            fin = medio - 1;
+    }
+    return -1;
+}
