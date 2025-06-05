@@ -1,0 +1,340 @@
+#include <iostream>  // Libreria para entrada y salida estandar
+#include <string>    // Libreria para manejar cadenas
+using namespace std; // Uso del espacio de nombres estandar
+
+// ---------------- ESTRUCTURAS ----------------
+
+// Estructura que representa un proceso
+struct Proceso {
+    int id;          // Identificador del proceso
+    string nombre;   // Nombre del proceso
+    int prioridad;   // Prioridad del proceso
+    int memoria;     // Memoria requerida por el proceso
+};
+
+// Nodo para lista enlazada de procesos
+struct Nodo {
+    Proceso dato;    // Dato que almacena un proceso
+    Nodo* sig;       // Puntero al siguiente nodo
+};
+
+// Nodo para pila de bloques de memoria
+struct NodoMemoria {
+    int bloque;          // Numero de bloque de memoria
+    NodoMemoria* sig;    // Puntero al siguiente nodo en la pila
+};
+
+// Nodo para cola de procesos en la CPU
+struct NodoCola {
+    Proceso dato;    // Dato que almacena un proceso
+    NodoCola* sig;   // Puntero al siguiente nodo en la cola
+};
+
+// ---------------- VARIABLES GLOBALES ----------------
+
+Nodo* lista = NULL;       // Puntero al inicio de la lista de procesos
+NodoMemoria* pila = NULL; // Puntero al tope de la pila de memoria
+NodoCola* frente = NULL;  // Puntero al inicio de la cola de CPU
+NodoCola* fin = NULL;     // Puntero al final de la cola de CPU
+
+// ---------------- FUNCIONES DE LISTA ----------------
+
+// Funcion para insertar un proceso en la lista
+void insertarProceso() {
+    Nodo* nuevo = new Nodo();  // Crear nuevo nodo
+
+    cout << "Ingrese ID del proceso: "; // Solicitar ID
+    cin >> nuevo->dato.id;               // Leer ID
+    if (nuevo->dato.id < 0) {            // Verificar que ID sea positivo
+        cout << "ID invalido. Debe ser positivo.\n";
+        return;
+    }
+
+    cout << "Ingrese nombre del proceso: "; // Solicitar nombre
+    cin >> nuevo->dato.nombre;              // Leer nombre
+
+    cout << "Ingrese prioridad del proceso (1 = Alta): "; // Solicitar prioridad
+    cin >> nuevo->dato.prioridad;                         // Leer prioridad
+    if (nuevo->dato.prioridad < 0) {                      // Verificar prioridad positiva
+        cout << "Prioridad invalida. Debe ser positiva.\n";
+        return;
+    }
+
+    cout << "Ingrese cantidad de memoria requerida: "; // Solicitar memoria
+    cin >> nuevo->dato.memoria;                        // Leer memoria
+    if (nuevo->dato.memoria < 0) {                     // Verificar memoria positiva
+        cout << "Memoria invalida. Debe ser positiva.\n";
+        return;
+    }
+
+    nuevo->sig = NULL;  // Inicializar siguiente nodo como NULL
+
+    if (lista == NULL) {      // Si la lista esta vacia
+        lista = nuevo;        // El nuevo nodo es el primero
+    } else {                  // Si la lista tiene elementos
+        Nodo* aux = lista;    // Puntero auxiliar para recorrer la lista
+        while (aux->sig != NULL) { // Avanzar hasta el final de la lista
+            aux = aux->sig;
+        }
+        aux->sig = nuevo;     // Insertar el nuevo nodo al final
+    }
+
+    cout << "Proceso agregado correctamente.\n"; // Confirmar insercion
+}
+
+// Funcion para mostrar todos los procesos en la lista
+void mostrarProcesos() {
+    Nodo* aux = lista;  // Puntero auxiliar para recorrer la lista
+    cout << "\n--- LISTA DE PROCESOS ---\n";
+    while (aux != NULL) {  // Mientras no se llegue al final
+        cout << "ID: " << aux->dato.id
+             << ", Nombre: " << aux->dato.nombre
+             << ", Prioridad: " << aux->dato.prioridad
+             << ", Memoria: " << aux->dato.memoria << "\n";
+        aux = aux->sig;    // Avanzar al siguiente nodo
+    }
+}
+
+// Funcion para buscar un proceso por ID
+void buscarProceso() {
+    int id;                // Variable para ID a buscar
+    cout << "Ingrese ID del proceso a buscar: ";
+    cin >> id;             // Leer ID
+    if (id < 0) {          // Verificar ID positivo
+        cout << "ID invalido. Debe ser positivo.\n";
+        return;
+    }
+
+    Nodo* aux = lista;     // Puntero auxiliar para recorrer la lista
+    while (aux != NULL) {  // Mientras no se llegue al final
+        if (aux->dato.id == id) { // Comparar ID
+            cout << "Proceso encontrado: " << aux->dato.nombre << "\n";
+            return;
+        }
+        aux = aux->sig;    // Avanzar al siguiente nodo
+    }
+    cout << "Proceso no encontrado.\n"; // Si no se encuentra
+}
+
+// Funcion para actualizar la prioridad de un proceso
+void actualizarPrioridad() {
+    int id, nueva;  // Variables para ID y nueva prioridad
+    cout << "Ingrese ID del proceso a actualizar: ";
+    cin >> id;      // Leer ID
+    if (id < 0) {   // Verificar ID positivo
+        cout << "ID invalido. Debe ser positivo.\n";
+        return;
+    }
+
+    cout << "Ingrese nueva prioridad: ";
+    cin >> nueva;  // Leer nueva prioridad
+    if (nueva < 0) { // Verificar prioridad positiva
+        cout << "Prioridad invalida. Debe ser positiva.\n";
+        return;
+    }
+
+    Nodo* aux = lista;  // Puntero auxiliar para recorrer la lista
+    while (aux != NULL) { // Mientras no se llegue al final
+        if (aux->dato.id == id) { // Buscar ID
+            aux->dato.prioridad = nueva; // Actualizar prioridad
+            cout << "Prioridad actualizada correctamente.\n";
+            return;
+        }
+        aux = aux->sig;  // Avanzar al siguiente nodo
+    }
+    cout << "Proceso no encontrado.\n"; // Si no se encuentra
+}
+
+// Funcion para ordenar la lista de procesos por prioridad (burbuja)
+void ordenarPorPrioridad() {
+    Nodo* i = lista;  // Puntero externo
+    while (i != NULL) {
+        Nodo* j = i->sig;  // Puntero interno
+        while (j != NULL) {
+            if (i->dato.prioridad > j->dato.prioridad) { // Comparar prioridades
+                Proceso temp = i->dato;  // Intercambiar datos
+                i->dato = j->dato;
+                j->dato = temp;
+            }
+            j = j->sig;  // Avanzar nodo interno
+        }
+        i = i->sig;  // Avanzar nodo externo
+    }
+    cout << "Lista ordenada por prioridad.\n"; // Confirmar ordenamiento
+}
+
+// ---------------- FUNCIONES DE PILA ----------------
+
+// Funcion para asignar un bloque de memoria a la pila
+void asignarMemoria() {
+    NodoMemoria* nuevo = new NodoMemoria(); // Crear nuevo nodo
+    cout << "Ingrese bloque de memoria: ";
+    cin >> nuevo->bloque;                   // Leer numero de bloque
+    if (nuevo->bloque < 0) {                // Verificar bloque positivo
+        cout << "Bloque invalido. Debe ser positivo.\n";
+        return;
+    }
+
+    nuevo->sig = pila;  // Apuntar al tope actual de la pila
+    pila = nuevo;       // Nuevo tope de la pila
+    cout << "Bloque asignado.\n"; // Confirmar asignacion
+}
+
+// Funcion para liberar un bloque de memoria de la pila
+void liberarMemoria() {
+    if (pila == NULL) {  // Verificar si la pila esta vacia
+        cout << "No hay memoria asignada.\n";
+        return;
+    }
+    cout << "Bloque liberado: " << pila->bloque << "\n"; // Mostrar bloque liberado
+    NodoMemoria* temp = pila;  // Guardar nodo a eliminar
+    pila = pila->sig;          // Actualizar tope de la pila
+    delete temp;               // Liberar memoria del nodo eliminado
+}
+
+// Funcion para mostrar los bloques de memoria en la pila
+void mostrarMemoria() {
+    NodoMemoria* aux = pila;  // Puntero auxiliar para recorrer la pila
+    cout << "Bloques de memoria (pila): ";
+    while (aux != NULL) {     // Mientras no se llegue al final
+        cout << aux->bloque << " ";
+        aux = aux->sig;       // Avanzar al siguiente nodo
+    }
+    cout << "\n";             // Nueva linea al final
+}
+
+// ---------------- FUNCIONES DE COLA (CPU) ----------------
+
+// Funcion para encolar un proceso en la CPU
+void encolarProcesoCPU() {
+    NodoCola* nuevo = new NodoCola(); // Crear nuevo nodo
+
+    cout << "Ingrese ID del proceso: "; // Solicitar ID
+    cin >> nuevo->dato.id;              // Leer ID
+    if (nuevo->dato.id < 0) {           // Verificar ID positivo
+        cout << "ID invalido.\n";
+        return;
+    }
+
+    cout << "Ingrese nombre del proceso: "; // Solicitar nombre
+    cin >> nuevo->dato.nombre;              // Leer nombre
+
+    cout << "Ingrese prioridad: ";  // Solicitar prioridad
+    cin >> nuevo->dato.prioridad;   // Leer prioridad
+    if (nuevo->dato.prioridad < 0) { // Verificar prioridad positiva
+        cout << "Prioridad invalida.\n";
+        return;
+    }
+
+    cout << "Ingrese memoria: ";    // Solicitar memoria
+    cin >> nuevo->dato.memoria;     // Leer memoria
+    if (nuevo->dato.memoria < 0) {  // Verificar memoria positiva
+        cout << "Memoria invalida.\n";
+        return;
+    }
+
+    nuevo->sig = NULL; // Inicializar siguiente como NULL
+
+    if (frente == NULL) { // Si la cola esta vacia
+        frente = fin = nuevo; // El nuevo nodo es el primero y el ultimo
+    } else {                  // Si la cola tiene elementos
+        fin->sig = nuevo;     // Agregar al final de la cola
+        fin = nuevo;          // Actualizar puntero fin
+    }
+
+    cout << "Proceso encolado a la CPU.\n"; // Confirmar encolado
+}
+
+// Funcion para desencolar un proceso de la CPU
+void desencolarProcesoCPU() {
+    if (frente == NULL) { // Verificar si la cola esta vacia
+        cout << "La cola esta vacia.\n";
+        return;
+    }
+    cout << "Ejecutando proceso: " << frente->dato.nombre << "\n"; // Mostrar proceso
+    NodoCola* temp = frente;  // Guardar nodo a eliminar
+    frente = frente->sig;     // Avanzar puntero frente
+    delete temp;              // Liberar nodo
+    if (frente == NULL) {     // Si la cola queda vacia
+        fin = NULL;           // Actualizar puntero fin
+    }
+}
+
+// Funcion para mostrar la cola de procesos en la CPU
+void mostrarColaCPU() {
+    NodoCola* aux = frente;  // Puntero auxiliar para recorrer la cola
+    cout << "Cola de procesos (CPU):\n";
+    while (aux != NULL) {    // Mientras no se llegue al final
+        cout << "ID: " << aux->dato.id
+             << ", Nombre: " << aux->dato.nombre
+             << ", Prioridad: " << aux->dato.prioridad
+             << ", Memoria: " << aux->dato.memoria << "\n";
+        aux = aux->sig;      // Avanzar al siguiente nodo
+    }
+}
+
+// ---------------- MENÚ PRINCIPAL ----------------
+
+int main() {
+    int opcion;
+    do {
+        cout << "\n--- SISTEMA DE GESTION DE PROCESOS ---\n";
+        cout << "1. Insertar proceso \n";
+        cout << "2. Mostrar procesos \n";
+        cout << "3. Buscar proceso por ID \n";
+        cout << "4. Actualizar prioridad \n";
+        cout << "5. Ordenar por prioridad \n";
+        cout << "6. Asignar bloque de memoria \n";
+        cout << "7. Liberar bloque de memoria \n";
+        cout << "8. Mostrar memoria \n";
+        cout << "9. Encolar proceso en CPU \n";
+        cout << "10. Ejecutar proceso CPU \n";
+        cout << "11. Mostrar cola CPU\n";
+        cout << "12. Salir\n";
+        cout << "Seleccione una opcion: ";
+        cin >> opcion;
+
+        switch(opcion) {
+            case 1:
+			insertarProceso();
+			break;
+            case 2: 
+			mostrarProcesos(); 
+			break;
+            case 3: 
+			buscarProceso(); 
+			break;
+            case 4: 
+			actualizarPrioridad(); 
+			break;
+            case 5: 
+			ordenarPorPrioridad(); 
+			break;
+            case 6: 
+			asignarMemoria(); 
+			break;
+            case 7: 
+			liberarMemoria(); 
+			break;
+            case 8: 
+			mostrarMemoria(); 
+			break;
+            case 9: 
+			encolarProcesoCPU(); 
+			break;
+            case 10: 
+			desencolarProcesoCPU(); 
+			break;
+            case 11: 
+			mostrarColaCPU(); 
+			break;
+            case 12: 
+			cout << "Saliendo del programa...\n"; 
+			break;
+            default: 
+			cout << "Opcion no valida.\n";
+        }
+    } while (opcion != 12);
+
+    return 0; // Fin del programa
+}
